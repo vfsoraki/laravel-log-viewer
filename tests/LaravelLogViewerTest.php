@@ -3,6 +3,7 @@
 namespace Rap2hpoutre\LaravelLogViewer;
 
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
+use Illuminate\Support\Facades\Config;
 
 /**
  * Class LaravelLogViewerTest
@@ -35,6 +36,21 @@ class LaravelLogViewerTest extends OrchestraTestCase
         }
 
         $this->assertEquals("laravel.log", $laravel_log_viewer->getFileName());
+    }
+
+    public function testMaxFileSizeOption()
+    {
+        $file_size = filesize(__DIR__ . '/laravel.log');
+
+        // Test when $file_size < max_file_size
+        Config::set('logviewer.max_file_size', $file_size + 1000);
+        $laravel_log_viewer = new LaravelLogViewer();
+        $this->assertNotNull($laravel_log_viewer->all());
+
+        // Test when $file_size > max_file_size
+        Config::set('logviewer.max_file_size', $file_size - 1000);
+        $laravel_log_viewer = new LaravelLogViewer();
+        $this->assertNull($laravel_log_viewer->all());
     }
 
     public function testAll()
