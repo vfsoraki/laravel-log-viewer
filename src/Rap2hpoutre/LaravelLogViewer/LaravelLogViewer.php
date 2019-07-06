@@ -29,6 +29,11 @@ class LaravelLogViewer
     const MAX_FILE_SIZE = 52428800;
 
     /**
+     * @var int max_file_size
+     */
+    private $max_file_size;
+
+    /**
      * @var Level level
      */
     private $level;
@@ -46,7 +51,7 @@ class LaravelLogViewer
         $this->level = new Level();
         $this->pattern = new Pattern();
         $this->storage_path = function_exists('config') ? config('logviewer.storage_path', storage_path('logs')) : storage_path('logs');
-
+        $this->max_file_size = function_exists('config') ? config('logviewer.max_file_size', self::MAX_FILE_SIZE) : self::MAX_FILE_SIZE;
     }
 
     /**
@@ -150,7 +155,7 @@ class LaravelLogViewer
             $this->file = $log_file[0];
         }
 
-        if (app('files')->size($this->file) > self::MAX_FILE_SIZE) {
+        if (app('files')->size($this->file) > $this->max_file_size) {
             return null;
         }
 
